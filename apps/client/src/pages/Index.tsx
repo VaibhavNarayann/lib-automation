@@ -24,7 +24,7 @@ const Index = () => {
           className="relative z-10 text-center px-6"
         >
           <h1 className="text-4xl md:text-6xl font-display font-bold text-primary-foreground mb-4 drop-shadow-lg">
-            The Grand Library
+            The Teaching World Library
           </h1>
           <p className="text-lg md:text-xl text-primary-foreground/80 font-body max-w-xl mx-auto">
             A sanctuary of knowledge, imagination, and community
