@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { BookOpen, User, Phone, MapPin, Calendar } from "lucide-react";
 import { z } from "zod";
+import axios from "axios"
 
 const formSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
@@ -23,8 +24,21 @@ const RegistrationForm = () => {
     setErrors((e) => ({ ...e, [field]: "" }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
+    console.log("1")
+    try{
+      const res = await axios.post("http://localhost:3000/post", form);
+        console.log(res); 
+    toast.success("Registration successful! Welcome to the library.");
+
+         setForm({ name: "", number: "", address: "", age: "" });
+    }catch(error){  
+      console.log(error); 
+    }
+    console.log("2")
+
+
     const result = formSchema.safeParse(form);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
@@ -34,16 +48,15 @@ const RegistrationForm = () => {
       setErrors(fieldErrors);
       return;
     }
-    toast.success("Registration successful! Welcome to the library.");
-    setForm({ name: "", number: "", address: "", age: "" });
+   
     setErrors({});
   };
 
   const fields = [
     { key: "name", label: "Full Name", icon: User, type: "text", placeholder: "John Doe" },
     { key: "number", label: "Phone Number", icon: Phone, type: "tel", placeholder: "+1 234 567 890" },
-    { key: "address", label: "Address", icon: MapPin, type: "text", placeholder: "123 Book Street" },
-    { key: "age", label: "Age", icon: Calendar, type: "number", placeholder: "25" },
+    // { key: "address", label: "Address", icon: MapPin, type: "text", placeholder: "123 Book Street" },
+    // { key: "age", label: "Age", icon: Calendar, type: "number", placeholder: "25" },
   ];
 
   return (
