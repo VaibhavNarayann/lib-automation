@@ -33,7 +33,7 @@ const RegistrationForm = () => {
     toast.success("Registration successful! Welcome to the library.");
 
          setForm({ name: "", number: "", address: "", age: "" });
-    }catch(error){  
+    }catch(error){ 
       console.log(error); 
     }
     console.log("2")
