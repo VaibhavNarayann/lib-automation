@@ -45,7 +45,7 @@ app.get("/", async (req,res)=> {
 
 
 app.post("/post", async(req , res)=> {
-	const {name, number} = req.body;
+	const {name, number, fee} = req.body;
 	try {
 		// Append new row so old registrations are kept; range A:B = append to next empty row
 		await sheets.spreadsheets.values.append({
@@ -54,7 +54,7 @@ app.post("/post", async(req , res)=> {
 			valueInputOption: 'USER_ENTERED',
 			insertDataOption: 'INSERT_ROWS',
 			requestBody: {
-				values: [[name, number]],
+				values: [[name, number, fee]],
 			},
 		});
 		res.status(201).json({ message: "Registration added" });
@@ -77,7 +77,7 @@ app.post("/webhook", async (req, res) => {
       if (data.length === 0) {
         reply = "No data found";
       } else {
-        reply = data.map((row:any) => `${row.name} - ${row.number}`).join("\n");
+        reply = data.map((row:any) => `${row.name} - ${row.number} - ${row.fee}`).join("\n");
       }
     }
 
@@ -126,12 +126,12 @@ async function getSheetData() {
 
     const response = await  sheets.spreadsheets.values.get({
         spreadsheetId : SPREADSHEET_ID,
-        range: 'Sheet1!A:B',
+        range: 'Sheet1!A:C',
     })
     
     const rows:any = response.data.values; 
 
-     if (!rows || rows.length < 2) return [];
+     if (!rows || rows.length < 3) return [];
 
      const headers: string[] = rows[0].map((h:string) => h.trim().toLowerCase());
 

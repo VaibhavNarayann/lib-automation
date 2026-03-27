@@ -12,7 +12,7 @@ const formSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
   number: z.string().trim().min(7, "Enter a valid phone number").max(15),
   address: z.string().trim().min(1, "Address is required").max(300),
-  age: z.string().trim().min(1, "Age is required"),
+  // age: z.string().trim().min(1, "Age is required"),
 });
 
 const RegistrationForm = () => {
@@ -53,10 +53,10 @@ const RegistrationForm = () => {
   };
 
   const fields = [
-    { key: "name", label: "Full Name", icon: User, type: "text", placeholder: "John Doe" },
-    { key: "number", label: "Phone Number", icon: Phone, type: "tel", placeholder: "+1 234 567 890" },
-    // { key: "address", label: "Address", icon: MapPin, type: "text", placeholder: "123 Book Street" },
-    // { key: "age", label: "Age", icon: Calendar, type: "number", placeholder: "25" },
+    { key: "name", label: "Full Name", icon: User, type: "text", placeholder: "Joe " },
+    { key: "number", label: "Phone Number", icon: Phone, type: "tel", placeholder: "91 9587963739"},
+    { key: "address", label: "Address", icon: MapPin, type: "text", placeholder: "123 Street" },
+    
   ];
 
   return (
