@@ -16,7 +16,7 @@ const formSchema = z.object({
 });
 
 const RegistrationForm = () => {
-  const [form, setForm] = useState({ name: "", number: "", address: "", age: "" });
+  const [form, setForm] = useState({ name: "", number: "", address: "",});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (field: string, value: string) => {
@@ -32,7 +32,7 @@ const RegistrationForm = () => {
         console.log(res); 
     toast.success("Registration successful! Welcome to the library.");
 
-         setForm({ name: "", number: "", address: "", age: "" });
+         setForm({ name: "", number: "", address: ""});
     }catch(error){ 
       console.log(error); 
     }

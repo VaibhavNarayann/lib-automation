@@ -4,6 +4,8 @@ import cors from "cors"
 import dotenv from 'dotenv';
 import MessagingResponse from "twilio/lib/twiml/MessagingResponse.js";
 import twilio from "twilio"; 
+import { json } from "body-parser";
+import { addOrUpdateRow, getSheetData } from "./store/getSheetData.js";
 dotenv.config();
 export type SheetRow = Record<string, string>;
 
@@ -26,35 +28,56 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client =  twilio(accountSid, authToken); 
 
-app.get("/", async (req,res)=> {
-	// try {
-	// 	const response = await sheets.spreadsheets.values.get({
-    // spreadsheetId: SPREADSHEET_ID,
-    // range: 'Sheet1!A1:D10', 
-  	// });
 
-	// 	const rows = response.data.values;	
-	// 	console.log('Data:', rows);
-  	// 	res.json({data: rows});
-	// }catch(error){
-	// 	console.error(error); 
-	// 	res.status(500).json({error : "Failed to read sheet"})
-	// }
 
-})
+// async function addRow(name: string, fee: string) {
+  
+//     await sheets.spreadsheets.values.update({
+//       spreadsheetId: SPREADSHEET_ID,
+//       range: "Sheet1!A:C", // members, contact, fees (or whatever your columns are)
+//       valueInputOption: "USER_ENTERED",
+//       insertDataOption: "INSERT_ROWS",
+//       requestBody: {
+//         values: [[name, fee]], // add fee here too if needed: [name, number, fee]
+//       },
+//     });
+//   }
+
+
+
+
+// app.get("/", async (req,res)=> {
+// 	try {
+// 		const response = await sheets.spreadsheets.values.get({
+//     spreadsheetId: SPREADSHEET_ID,
+//     range: 'Sheet1!A1:D10', 
+//   	});
+
+// 		const rows = response.data.values;	
+// 		console.log('Data:', rows);
+//   		res.json({data: rows});
+// 	}catch(error){
+// 		console.error(error); 
+// 		res.status(500).json({error : "Failed to read sheet"})
+// 	}
+
+// })
 
 
 app.post("/post", async(req , res)=> {
-	const {name, number, fee} = req.body;
+	const {name, number, address} = req.body;
+    if(!name || !number || !address  ){
+    return res.status(401).json({message: "All fields are required"})
+    } 
 	try {
 		// Append new row so old registrations are kept; range A:B = append to next empty row
 		await sheets.spreadsheets.values.append({
 			spreadsheetId: SPREADSHEET_ID,
-			range: 'Sheet1!A:B',
+			range: 'Sheet1!A:C',
 			valueInputOption: 'USER_ENTERED',
 			insertDataOption: 'INSERT_ROWS',
 			requestBody: {
-				values: [[name, number, fee]],
+				values: [[name, number, address]],
 			},
 		});
 		res.status(201).json({ message: "Registration added" });
@@ -77,34 +100,45 @@ app.post("/webhook", async (req, res) => {
       if (data.length === 0) {
         reply = "No data found";
       } else {
-        reply = data.map((row:any) => `${row.name} - ${row.number} - ${row.fee}`).join("\n");
+        // reply = data.map((row:any) => `${row.members} - ${row.contact} - ${row.fees}`).join("\n");
+        reply = data.map((row: any, index: number) => 
+        `*${index + 1}. ${row.name}*\n` +
+        `   📞 Contact: ${row.contact}\n` +
+        `   💰 Fees: ${row.fees}\n`+
+        `   🏠 Address: ${row.address} `
+      ).join("\n\n");
+        
       }
     }
 
-    // ================== CASE 2: ADD ENTRY ==================
-    // else if (incomingMsg.startsWith("add")) {
-    //   // format: add vaibhav 5000
-    //   const parts = incomingMsg.split(" ");
+    // // ================== CASE 2: ADD ENTRY ==================
+    else if (incomingMsg.startsWith("add ")) {
+      const parts = incomingMsg.split(" ");
 
-    //   if (parts.length < 3) {
-    //     reply = "Format: add name fee";
-    //   } else {
-    //     const name = parts[1];
-    //     const number = parts[2];
+      if (parts.length < 3) {
+        reply = "Format: add name fee";
+      } else {
+        const name = parts[1];
+        const fees = parts[2];
 
-    //     await addRow(name, number);
-    //     reply = `✅ Added: ${name} - ₹${fee}`;
-    //   }
-    // }
+        const result = await addOrUpdateRow(name, fees);
+
+        if (result === "updated") {
+          reply = `♻️ Updated ${name} fee to ₹${fees}`;
+        } else {
+          reply = `✅ Added ${name} with ₹${fees}`;
+        }
+      }
+    }
 
     // ================== CASE 3: GET BY NAME ==================
     else {
       const result = data.find(
-        (row:any) => row.name.toLowerCase() === incomingMsg
+        (row:any) => row.members.toLowerCase() === incomingMsg
       );
 
       if (result) {
-        reply = `Name: ${result.name}\nFee: ₹${result.fee}`;
+        reply = `Name: ${result.members}\nFee: ₹${result.fee}`;
       } else {
         reply = "No data found 😢";
       }
@@ -121,29 +155,5 @@ app.post("/webhook", async (req, res) => {
 });
 
 
-async function getSheetData() {
-    const SPREADSHEET_ID = process.env.SPREADSHEET_ID!
-
-    const response = await  sheets.spreadsheets.values.get({
-        spreadsheetId : SPREADSHEET_ID,
-        range: 'Sheet1!A:C',
-    })
-    
-    const rows:any = response.data.values; 
-
-     if (!rows || rows.length < 3) return [];
-
-     const headers: string[] = rows[0].map((h:string) => h.trim().toLowerCase());
-
-     const data = rows.slice(1).map((row:any) => {
-    const obj: SheetRow  = {};
-    headers.forEach((header, i) => {
-      obj[header] = row[i] || "";
-    });
-    return obj;
-  });
- 
-  return data;
-}
 
 app.listen(3000, () => console.log("Server running on port 3000"));
