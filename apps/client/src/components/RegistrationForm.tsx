@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { BookOpen, User, Phone, MapPin, Calendar } from "lucide-react";
 import { z } from "zod";
 import axios from "axios"
+import { Button } from "./ui/button";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
 
 const formSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),

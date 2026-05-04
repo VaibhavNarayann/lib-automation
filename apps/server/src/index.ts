@@ -3,8 +3,7 @@ import {google} from "googleapis"
 import cors from "cors"
 import dotenv from 'dotenv';
 import MessagingResponse from "twilio/lib/twiml/MessagingResponse.js";
-import twilio from "twilio"; 
-import { json } from "body-parser";
+import twilio from "twilio";
 import { addOrUpdateRow, getSheetData } from "./store/getSheetData.js";
 dotenv.config();
 export type SheetRow = Record<string, string>;
@@ -28,42 +27,7 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client =  twilio(accountSid, authToken); 
 
-
-
-// async function addRow(name: string, fee: string) {
-  
-//     await sheets.spreadsheets.values.update({
-//       spreadsheetId: SPREADSHEET_ID,
-//       range: "Sheet1!A:C", // members, contact, fees (or whatever your columns are)
-//       valueInputOption: "USER_ENTERED",
-//       insertDataOption: "INSERT_ROWS",
-//       requestBody: {
-//         values: [[name, fee]], // add fee here too if needed: [name, number, fee]
-//       },
-//     });
-//   }
-
-
-
-
-// app.get("/", async (req,res)=> {
-// 	try {
-// 		const response = await sheets.spreadsheets.values.get({
-//     spreadsheetId: SPREADSHEET_ID,
-//     range: 'Sheet1!A1:D10', 
-//   	});
-
-// 		const rows = response.data.values;	
-// 		console.log('Data:', rows);
-//   		res.json({data: rows});
-// 	}catch(error){
-// 		console.error(error); 
-// 		res.status(500).json({error : "Failed to read sheet"})
-// 	}
-
-// })
-
-
+//This endpoint append users data -> google sheet
 app.post("/post", async(req , res)=> {
 	const {name, number, address} = req.body;
     if(!name || !number || !address  ){
@@ -87,6 +51,7 @@ app.post("/post", async(req , res)=> {
 	}
 })
 
+// /webhook is for whatsapp chat part
 app.post("/webhook", async (req, res) => {
   const incomingMsg = req.body.Body;
   const twiml = new MessagingResponse();
