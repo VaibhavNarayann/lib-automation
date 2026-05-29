@@ -78,9 +78,8 @@ app.post("/webhook", async (req, res) => {
 
     // // ================== CASE 2: ADD ENTRY ==================
     else if (incomingMsg.startsWith("add ")) {
-      const parts = incomingMsg.split(" ");
-
-      if (parts.length < 3) {
+      const parts = incomingMsg.split(" ")
+      if (parts.length < 4) {
         reply = "Format: add name fee";
       } else {
         const name = parts[1];
