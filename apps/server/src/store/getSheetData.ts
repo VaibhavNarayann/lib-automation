@@ -3,16 +3,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 export type SheetRow = Record<string, string>;
 
-
 const credentials  = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON!);
-
     const auth = new google.auth.GoogleAuth({
     credentials,
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 }); 
 
 const sheets = google.sheets({ version: 'v4', auth });
-
 
 export async function getSheetData() {
     const SPREADSHEET_ID = process.env.SPREADSHEET_ID!
@@ -39,7 +36,6 @@ export async function getSheetData() {
   return data;
 }
 
-
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID!; 
 
 
@@ -55,8 +51,6 @@ const SPREADSHEET_ID = process.env.SPREADSHEET_ID!;
 //       },
 //     });
 //   }
-
-
 
 export async function addOrUpdateRow(name: string, fees: string) {
   const res = await sheets.spreadsheets.values.get({
@@ -86,7 +80,6 @@ export async function addOrUpdateRow(name: string, fees: string) {
       return "updated";
     }
   }
-
   // If not found, add new row
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
