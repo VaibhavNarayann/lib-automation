@@ -28,7 +28,7 @@ const RegistrationForm = () => {
     e.preventDefault();
     console.log("1")
     try{
-      const res = await axios.post("http://localhost:3000/post", form);
+      const res = await axios.post(`https://lib-automation.onrender.com/post`, form);
         console.log(res); 
     toast.success("Registration successful! Welcome to the library.");
 
